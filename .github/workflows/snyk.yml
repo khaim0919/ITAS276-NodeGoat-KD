@@ -1,0 +1,25 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+jobs:
+  snyk:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build a Docker image
+      run: docker build -t khaim0919/itas-276-assignment01:recent .
+    - name: Run Snyk to check Docker image for vulnerabilities
+      uses: snyk/actions/docker@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: khaim0919/itas-276-assignment01:recent
+    # Save the log to file
+    - uses: actions/upload-artifact@v4
+      with:
+        name: snyk.sarif
+        path: snyk.sarif

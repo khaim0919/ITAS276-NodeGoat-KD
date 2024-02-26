@@ -1,0 +1,31 @@
+name: Semgrep
+
+on:
+  push:
+    branches: ["master"]
+
+jobs:
+  semgrep:
+    name: semgrep/ci 
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep
+
+    if: (github.actor != 'dependabot[bot]')
+
+    steps:
+        # Fetch project source with GitHub Actions Checkout.
+        - uses: actions/checkout@v3
+        # Run the "semgrep" command on the command line
+        - name: semgrep scan
+          run: |
+              semgrep \
+              --sarif --output semgrep-sast.sarif \
+              --metrics=off \
+              --config="p/default"
+        # Save the log to file
+        - uses: actions/upload-artifact@v4
+          with:
+            name: semgrep-sast.sarif
+            path: semgrep-sast.sarif
