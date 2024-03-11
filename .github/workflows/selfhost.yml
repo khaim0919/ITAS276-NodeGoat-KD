@@ -1,0 +1,23 @@
+name: Testing for selfhosting
+
+on:
+    push:
+      branches: [ "master" ]
+    pull_request:
+      branches: [ "master" ]
+    
+jobs:
+    
+    deploy:
+        name: "Deploy to ITAS WMD server"
+        runs-on: itas276-kdickinson
+
+        steps:
+            -   name: Copy source code files
+                uses: actions/checkout@master
+
+            -   name: Test files are visibile
+                # Execute some shell commands on your server (this is the self-hosted instance)
+                run: |
+                    whoami
+                    ls-lah
