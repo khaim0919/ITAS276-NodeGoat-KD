@@ -10,7 +10,7 @@ jobs:
     
     deploy:
         name: "Deploy to ITAS WMD server"
-        runs-on: itas276-kdickinson
+        runs-on: self-hosted
 
         steps:
             -   name: Copy source code files
