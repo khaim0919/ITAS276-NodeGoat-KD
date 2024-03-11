@@ -1,4 +1,4 @@
-name: Testing for selfhosting
+name: Self Hosting
 
 on:
     push:
