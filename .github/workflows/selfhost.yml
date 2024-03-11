@@ -20,4 +20,4 @@ jobs:
                 # Execute some shell commands on your server (this is the self-hosted instance)
                 run: |
                     whoami
-                    ls-lah
+                    ls
