@@ -155,7 +155,7 @@ jobs:
         embed-title: "Snyk complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ job.status == 'failed' && 'not' || '' }} completed successfully.
+          Job was ${{ needs.snyk.result == 'failure' && 'not' || '' }} completed successfully. ${{needs.snyk.result}}
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
