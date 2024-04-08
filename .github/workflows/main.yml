@@ -267,7 +267,7 @@ jobs:
         embed-title: "End to end test complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ needs.e2e-test.result == 'failed' && 'not' || '' }} completed successfully. ${{needs.e2e-test.result}}
+          Job was ${{ needs.e2e-test.result == 'failure' && 'not' || '' }} completed successfully. ${{needs.e2e-test.result}}
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
