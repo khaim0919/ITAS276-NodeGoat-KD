@@ -19,7 +19,7 @@ jobs:
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
         embed-author-name: "${{ github.triggering_actor }}"
-        thread-id: 1226941088137478236
+        thread-id: "1226941088137478236"
 
   # Lint through code that is published
   lint:
