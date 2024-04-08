@@ -5,9 +5,27 @@ name: CI
 
 
 jobs:
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-begin:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Security Pipeline jobs are starting..."
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        embed-author-name: "${{ github.triggering_actor }}"
+
+  # Lint through code that is published
   lint:
     name: Node.js
     runs-on: ubuntu-latest
+    needs: discord-begin
+
     strategy:
       fail-fast: false
       matrix:
@@ -25,11 +43,12 @@ jobs:
       - name: Run linter
         run: npx --no-install jshint@2.12.0 .
 
-
+  # Use semgrep on the new push
   semgrep:
     name: semgrep/ci
     runs-on: ubuntu-latest
     needs: lint
+
     container:
       image: semgrep/semgrep
     if: '(github.actor != ''dependabot[bot]'')'
@@ -46,10 +65,11 @@ jobs:
           name: semgrep-sast.sarif
           path: semgrep-sast.sarif
 
-
+  # Use snyk on the new push
   snyk:
     runs-on: ubuntu-latest
     needs: lint
+
     steps:
       - uses: actions/checkout@v2
       - name: Build a Docker image
@@ -65,7 +85,7 @@ jobs:
           name: snyk.sarif
           path: snyk.sarif
 
-
+  # Deploy to the WMD server, make sure it is working correctly
   deploy:
     name: Deploy to ITAS WMD server
     runs-on: self-hosted
@@ -76,6 +96,7 @@ jobs:
     # this is done so later parts of the workflow can be 
     # tested without changing the core of how this repo works.
     if: always()
+
     steps:
       - name: Copy source code files
         uses: actions/checkout@master
@@ -85,7 +106,7 @@ jobs:
           ls
           docker compose up -d
 
-  
+  # Run the end to end test files
   e2e-test:
     name: Node.js
     runs-on: ubuntu-latest
@@ -96,6 +117,7 @@ jobs:
     # this is done so later parts of the workflow can be 
     # tested without changing the core of how this repo works.
     if: always()
+
     strategy:
       fail-fast: false
       matrix:
@@ -149,6 +171,7 @@ jobs:
           name: 'cypress-artifacts-node${{ matrix.node-version }}'
           path: test/e2e/screenshots
 
+  # Upload to Dockerhub after tests are finished
   build:
     runs-on: ubuntu-latest
     needs:
@@ -158,6 +181,7 @@ jobs:
     # this is done so later parts of the workflow can be 
     # tested without changing the core of how this repo works.
     if: always()
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
