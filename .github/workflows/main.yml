@@ -15,11 +15,12 @@ jobs:
         webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
         username: GIR ${{github.repository}}
         avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
-        embed-title: "Starting Security Pipeline jobs for ${{github.event.head_commit.message}}"
+        embed-title: "Starting Security Pipeline jobs for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
+
 
   # Lint through code that is published
   lint:
@@ -44,6 +45,23 @@ jobs:
       - name: Run linter
         run: npx --no-install jshint@2.12.0 .
 
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-lint:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Linting complete for \"${{github.event.head_commit.message}}\""
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
+
+
   # Use semgrep on the new push
   semgrep:
     name: semgrep/ci
@@ -65,6 +83,28 @@ jobs:
         with:
           name: semgrep-sast.sarif
           path: semgrep-sast.sarif
+      
+      - name: Save SARIF artifact ID
+        run: echo "::set-output name=sarif_id::${{ steps.upload_sarif.outputs.artifact_id }}"
+
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-semgrep:
+    runs-on: ubuntu-latest
+    needs: semgrep
+
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Semgrep complete for \"${{github.event.head_commit.message}}\""
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n[Download Sarif File](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.semgrep.outputs.sarif_id }})"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
+
 
   # Use snyk on the new push
   snyk:
@@ -85,6 +125,25 @@ jobs:
         with:
           name: snyk.sarif
           path: snyk.sarif
+
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-snyk:
+    runs-on: ubuntu-latest
+    needs: snyk
+
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Snyk complete for \"${{github.event.head_commit.message}}\""
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
+
 
   # This job was causing issues as it is trying to connect to
   # an ITAS runner but it seems all runners are down. 
@@ -108,6 +167,7 @@ jobs:
   #         whoami
   #         ls
   #         docker compose up -d
+
 
   # Run the end to end test files
   e2e-test:
@@ -174,6 +234,25 @@ jobs:
           name: 'cypress-artifacts-node${{ matrix.node-version }}'
           path: test/e2e/screenshots
 
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-e2e:
+    runs-on: ubuntu-latest
+    needs: e2e-test
+
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "End to end test complete for \"${{github.event.head_commit.message}}\""
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
+
+
   # Upload to Dockerhub after tests are finished
   build:
     runs-on: ubuntu-latest
@@ -204,10 +283,30 @@ jobs:
           tags: 'khaim0919/itas-276-assignment01:latest'
 
   # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-build:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Discord Notification start
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Build complete for \"${{github.event.head_commit.message}}\"... Cleaning up"
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
+
+
+  # Post a message to the ITAS Discord channel with pipeline updates.
   discord-end:
     runs-on: ubuntu-latest
     needs:
       - build
+      - discord-build
     # This line will override the stopping on failure, 
     # this is done so later parts of the workflow can be 
     # tested without changing the core of how this repo works.
@@ -220,7 +319,7 @@ jobs:
         webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
         username: GIR ${{github.repository}}
         avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
-        embed-title: "Finished Security Pipeline jobs for ${{github.event.head_commit.message}}"
+        embed-title: "Finished Security Pipeline jobs for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
         embed-author-name: "${{ github.triggering_actor }}"
