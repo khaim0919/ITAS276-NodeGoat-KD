@@ -62,7 +62,7 @@ jobs:
         embed-title: "Linting complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ job.status == 'failed' && 'not' || '' }} completed successfully.
+          Job was ${{ needs.lint.result == 'failure' && 'not' || '' }} completed successfully.
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
@@ -111,7 +111,7 @@ jobs:
         embed-title: "Semgrep complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ job.status == 'failed' && 'not' || '' }} completed successfully.
+          Job was ${{ needs.semgrep.result == 'failure' && 'not' || '' }} completed successfully.
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           [Download Sarif File](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{ needs.semgrep.outputs.sarif_id }})
         embed-author-name: "${{ github.triggering_actor }}"
@@ -155,7 +155,7 @@ jobs:
         embed-title: "Snyk complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ needs.snyk.result == 'failure' && 'not' || '' }} completed successfully. ${{needs.snyk.result}}
+          Job was ${{ needs.snyk.result == 'failure' && 'not' || '' }} completed successfully.
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
@@ -267,7 +267,7 @@ jobs:
         embed-title: "End to end test complete for \"${{github.event.head_commit.message}}\""
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ needs.e2e-test.result == 'failure' && 'not' || '' }} completed successfully. ${{needs.e2e-test.result}}
+          Job was ${{ needs.e2e-test.result == 'failure' && 'not' || '' }} completed successfully.
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
@@ -319,7 +319,7 @@ jobs:
         embed-title: "Build complete for \"${{github.event.head_commit.message}}\"... Cleaning up"
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         embed-description: |
-          Job was ${{ job.status == 'failed' && 'not' || '' }} completed successfully.
+          Job was ${{ needs.build.result == 'failure' && 'not' || '' }} completed successfully.
           [Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
