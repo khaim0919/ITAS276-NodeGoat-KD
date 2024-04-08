@@ -85,26 +85,28 @@ jobs:
           name: snyk.sarif
           path: snyk.sarif
 
+  # This job was causing issues as it is trying to connect to
+  # an ITAS runner but it seems all runners are down. 
   # Deploy to the WMD server, make sure it is working correctly
-  deploy:
-    name: Deploy to ITAS WMD server
-    runs-on: self-hosted
-    needs:
-      - semgrep
-      - snyk
-    # This line will override the stopping on failure, 
-    # this is done so later parts of the workflow can be 
-    # tested without changing the core of how this repo works.
-    if: always()
-
-    steps:
-      - name: Copy source code files
-        uses: actions/checkout@master
-      - name: Test files are visibile
-        run: |
-          whoami
-          ls
-          docker compose up -d
+  # deploy:
+  #   name: Deploy to ITAS WMD server
+  #   runs-on: self-hosted
+  #   needs:
+  #     - semgrep
+  #     - snyk
+  #   # This line will override the stopping on failure, 
+  #   # this is done so later parts of the workflow can be 
+  #   # tested without changing the core of how this repo works.
+  #   if: always()
+  #
+  #   steps:
+  #     - name: Copy source code files
+  #       uses: actions/checkout@master
+  #     - name: Test files are visibile
+  #       run: |
+  #         whoami
+  #         ls
+  #         docker compose up -d
 
   # Run the end to end test files
   e2e-test:
@@ -176,7 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - e2e-test
-      - deploy
+      # - deploy
     # This line will override the stopping on failure, 
     # this is done so later parts of the workflow can be 
     # tested without changing the core of how this repo works.
