@@ -13,11 +13,11 @@ jobs:
       uses: tsickert/discord-webhook@v5.3.0
       with:
         webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
-        username: ${{github.repository}}
+        username: GIR ${{github.repository}}
         avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
-        embed-title: "Security Pipeline jobs are starting..."
+        embed-title: "Starting Security Pipeline jobs for ${{github.event.head_commit.message}}"
         embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
         embed-author-name: "${{ github.triggering_actor }}"
         thread-id: "1226941088137478236"
 
@@ -202,3 +202,26 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: 'khaim0919/itas-276-assignment01:latest'
+
+  # Post a message to the ITAS Discord channel with pipeline updates.
+  discord-end:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    # This line will override the stopping on failure, 
+    # this is done so later parts of the workflow can be 
+    # tested without changing the core of how this repo works.
+    if: always()
+    
+    steps:
+    - name: Discord Notification End
+      uses: tsickert/discord-webhook@v5.3.0
+      with:
+        webhook-url: ${{ secrets.DISCORD_WEBHOOK }}
+        username: GIR ${{github.repository}}
+        avatar-url: https://static.wikia.nocookie.net/zimwiki/images/4/4f/Duty_duty_duty_duty_duuuu.png/
+        embed-title: "Finished Security Pipeline jobs for ${{github.event.head_commit.message}}"
+        embed-url: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        embed-description: "[Action details ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n"
+        embed-author-name: "${{ github.triggering_actor }}"
+        thread-id: "1226941088137478236"
